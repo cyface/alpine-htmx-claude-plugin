@@ -22,10 +22,11 @@ Both skills include **Alpine + HTMX integration patterns** for combined usage.
 ## Installation
 
 ```bash
-# Use as a plugin directory
-claude --plugin-dir ~/.claude/plugins/alpine-htmx
+# From the Claude Code marketplace (recommended)
+/install alpine-htmx
 
-# Or add to your project's .claude/settings.json
+# Or install directly from GitHub
+claude plugin add --git https://github.com/cyface/alpine-htmx-claude-plugin.git
 ```
 
 ## Skills Detail
@@ -87,3 +88,7 @@ alpine-htmx/
 
 - **Alpine.js**: v3.x (current stable)
 - **HTMX**: v2.x (current stable)
+
+## License
+
+MIT
