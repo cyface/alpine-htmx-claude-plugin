@@ -1,5 +1,5 @@
 ---
-name: Alpine.js Development
+name: alpine-js
 description: >-
   This skill should be used when the user asks to "create an Alpine component",
   "add Alpine.js", "use x-data", "add reactivity", "create a dropdown",

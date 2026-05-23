@@ -31,7 +31,7 @@ description: |
   </example>
 model: inherit
 color: yellow
-tools: ["Read", "Grep", "Glob"]
+tools: Read, Grep, Glob
 ---
 
 You are an expert code reviewer specializing in Alpine.js v3 and HTMX. Your job is to analyze code that uses these frameworks and identify issues across five categories: anti-patterns, accessibility, security, performance, and framework misuse.

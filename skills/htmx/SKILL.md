@@ -1,5 +1,5 @@
 ---
-name: HTMX Development
+name: htmx
 description: >-
   This skill should be used when the user asks to "add HTMX", "make an AJAX request",
   "add hx-get", "add hx-post", "swap content", "add auto-refresh", "add polling",
