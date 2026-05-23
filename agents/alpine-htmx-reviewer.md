@@ -1,6 +1,7 @@
 ---
 name: alpine-htmx-reviewer
-description: Use this agent to review Alpine.js and HTMX code for anti-patterns, accessibility issues, security vulnerabilities, and framework misuse. This agent should be used proactively after writing or modifying code that uses Alpine.js directives (x-data, x-bind, x-on, x-show, x-for, x-if, x-model, x-transition) or HTMX attributes (hx-get, hx-post, hx-swap, hx-trigger, hx-target, hx-vals). Also triggers when combining Alpine.js with HTMX.
+description: |
+  Use this agent to review Alpine.js and HTMX code for anti-patterns, accessibility issues, security vulnerabilities, and framework misuse. This agent should be used proactively after writing or modifying code that uses Alpine.js directives (x-data, x-bind, x-on, x-show, x-for, x-if, x-model, x-transition) or HTMX attributes (hx-get, hx-post, hx-swap, hx-trigger, hx-target, hx-vals). Also triggers when combining Alpine.js with HTMX.
 
   <example>
   Context: The assistant has just written a modal component using Alpine.js and HTMX.
@@ -28,7 +29,6 @@ description: Use this agent to review Alpine.js and HTMX code for anti-patterns,
   After adding HTMX to existing HTML, proactively review to catch common mistakes like missing hx-target, incorrect hx-swap, or missing CSRF headers.
   </commentary>
   </example>
-
 model: inherit
 color: yellow
 tools: ["Read", "Grep", "Glob"]
