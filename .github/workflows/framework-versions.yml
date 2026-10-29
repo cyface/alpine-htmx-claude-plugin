@@ -1,0 +1,139 @@
+name: Framework versions
+
+# Weekly: compare the Alpine.js and htmx versions this plugin was verified
+# against (versions.json) with the npm dist-tags. When one moved, run Claude
+# Code to update the pinned versions and any guidance the release notes
+# justify, then open a pull request for human review.
+
+on:
+  schedule:
+    - cron: "17 11 * * 1"   # Mondays 11:17 UTC
+  workflow_dispatch:
+    inputs:
+      force:
+        description: "Run the upgrade job even if no version changed"
+        type: boolean
+        default: false
+
+concurrency:
+  group: framework-versions
+  cancel-in-progress: false
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    outputs:
+      changed: ${{ steps.compare.outputs.changed }}
+      summary: ${{ steps.compare.outputs.summary }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 1
+      - name: Compare versions.json with npm dist-tags
+        id: compare
+        shell: bash
+        run: |
+          set -euo pipefail
+          tags() { curl -fsSL --retry 3 "https://registry.npmjs.org/-/package/$1/dist-tags"; }
+          valid() { [[ "$1" =~ ^[0-9A-Za-z.+-]+$ ]]; }
+
+          alp_new=$(tags alpinejs | jq -r '.latest')
+          htmx_json=$(tags htmx.org)
+          htmx_latest_new=$(jq -r '.latest' <<<"$htmx_json")
+          htmx_next_new=$(jq -r '.next // "none"' <<<"$htmx_json")
+          for v in "$alp_new" "$htmx_latest_new" "$htmx_next_new"; do valid "$v" || { echo "unexpected version string: $v" >&2; exit 1; }; done
+
+          alp_old=$(jq -r '.alpinejs.latest' versions.json)
+          htmx_latest_old=$(jq -r '."htmx.org".latest' versions.json)
+          htmx_next_old=$(jq -r '."htmx.org".next // "none"' versions.json)
+
+          changed=false
+          summary=""
+          line() { if [[ "$2" != "$3" ]]; then changed=true; summary+="- $1: $2 -> $3"$'\n'; else summary+="- $1: $2 (unchanged)"$'\n'; fi; }
+          line "alpinejs (latest)" "$alp_old" "$alp_new"
+          line "htmx.org (latest)" "$htmx_latest_old" "$htmx_latest_new"
+          line "htmx.org (next)" "$htmx_next_old" "$htmx_next_new"
+
+          echo "changed=$changed" >> "$GITHUB_OUTPUT"
+          { echo "summary<<EOF"; printf '%s' "$summary"; echo "EOF"; } >> "$GITHUB_OUTPUT"
+          printf '%s' "$summary" >> "$GITHUB_STEP_SUMMARY"
+
+  upgrade:
+    needs: check
+    if: needs.check.outputs.changed == 'true' || inputs.force == true
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    permissions:
+      contents: write
+      pull-requests: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 1
+
+      - name: Update the plugin with Claude Code
+        uses: anthropics/claude-code-action@v1
+        with:
+          # /install-github-app saves a subscription token as CLAUDE_CODE_OAUTH_TOKEN.
+          # If you use an API key instead, replace this line with:
+          #   anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          claude_args: |
+            --max-turns 80
+            --allowedTools "Read,Glob,Grep,Edit,Write,WebFetch,Bash(claude plugin validate:*),Bash(npx -y @anthropic-ai/claude-code plugin validate:*)"
+          prompt: |
+            You are updating the alpine-htmx Claude Code plugin in this repository after a framework release. The weekly version check found:
+
+            ${{ needs.check.outputs.summary }}
+
+            Work in the checked-out tree only. You have no git or GitHub access; a later workflow step commits whatever you change and opens the pull request. Do not touch evals/results/ or .github/.
+
+            Procedure:
+            1. Read versions.json, CHANGELOG.md, .claude-plugin/plugin.json, and the SKILL.md of every skill under skills/ to see which versions and features the guidance currently claims.
+            2. For each package whose version moved, read the release notes for every version between the old and the new one before changing any guidance:
+               - Alpine.js: https://api.github.com/repos/alpinejs/alpine/releases?per_page=40 (and https://alpinejs.dev/ pages for anything the notes reference).
+               - htmx: https://api.github.com/repos/bigskysoftware/htmx/releases?per_page=40 and, for a 4.x version, the maintainer guidance shipped in the package at https://cdn.jsdelivr.net/npm/htmx.org@<version>/dist/skills/htmx-guidance.md and htmx-upgrade-from-htmx2.md. Note that htmx 2.x is npm "latest" and 4.x is "next"; both lines are supported and documented side by side in this plugin, so a change on one line must not be written into the other's column.
+            3. Update every pinned version string in skills/ (CDN script tags, "current as of", version tables) and in versions.json to the new versions. Use Grep to find each occurrence of the old version strings.
+            4. Change guidance only where a release note justifies it: a new directive, modifier, attribute, event, config key, plugin, or a documented behavior change. For each such change, keep a short note of the release-note line that justifies it. Do not add anything the release notes do not mention, and do not restate features that already appear in the files. Prefer leaving a file unchanged over guessing.
+            5. Bump the version in .claude-plugin/plugin.json: patch if only version pins moved, minor if guidance changed. Add a dated entry at the top of CHANGELOG.md listing the version bump and each guidance change with its release-note citation.
+            6. Validate: run `claude plugin validate --strict .`; if the claude command is not on PATH run `npx -y @anthropic-ai/claude-code plugin validate --strict .`. Fix anything it reports.
+            7. Write PR_BODY.md at the repository root in this shape:
+               ## Framework versions
+               (the version lines above)
+               ## Changes
+               (one bullet per file changed, with the release-note citation for each guidance change, or "version pins only")
+               ## Needs human verification
+               (anything you were unsure about, including release-note items you deliberately did not act on and why)
+            The pull request body is read from that file and the file is removed before committing.
+
+      - name: Read PR body and remove it from the tree
+        id: body
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ -f PR_BODY.md ]]; then
+            { echo "body<<EOF"; cat PR_BODY.md; echo; echo "EOF"; } >> "$GITHUB_OUTPUT"
+            rm PR_BODY.md
+          else
+            { echo "body<<EOF"; echo "Claude did not write PR_BODY.md; review the diff directly."; echo; echo "${{ needs.check.outputs.summary }}"; echo "EOF"; } >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Open or update the pull request
+        uses: peter-evans/create-pull-request@v7
+        with:
+          branch: chore/framework-versions
+          delete-branch: true
+          commit-message: "Update plugin for new Alpine.js / htmx releases"
+          title: "Update plugin for new Alpine.js / htmx releases"
+          body: ${{ steps.body.outputs.body }}
+          labels: framework-update
+          add-paths: |
+            versions.json
+            CHANGELOG.md
+            .claude-plugin/plugin.json
+            skills/**
+            agents/**
+            README.md

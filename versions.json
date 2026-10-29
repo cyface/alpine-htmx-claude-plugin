@@ -1,0 +1,5 @@
+{
+  "$comment": "Framework versions this plugin's guidance was last verified against. The framework-versions workflow compares these with npm dist-tags and opens a PR when they move.",
+  "alpinejs": { "latest": "3.17.5" },
+  "htmx.org": { "latest": "2.0.11", "next": "4.0.0" }
+}

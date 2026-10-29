@@ -1,0 +1,43 @@
+name: Plugin evals
+
+# Manual only: every run bills real model usage (roughly $2-3 for this suite).
+
+on:
+  workflow_dispatch:
+    inputs:
+      threshold:
+        description: "Minimum per-case score (0-1)"
+        default: "0.8"
+      max_cost_usd:
+        description: "Abort if the run would exceed this cost"
+        default: "10"
+
+jobs:
+  evals:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    permissions:
+      contents: read
+    env:
+      CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+      # Or: ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Run the eval suite (with and without the plugin)
+        run: |
+          npx -y @anthropic-ai/claude-code plugin eval . \
+            --trust-plugin --no-publish -j 2 \
+            --threshold "${{ inputs.threshold }}" \
+            --max-cost-usd "${{ inputs.max_cost_usd }}" \
+            --json eval-result.json
+      - name: Upload results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: eval-results
+          path: |
+            eval-result.json
+            evals/results/
