@@ -1,0 +1,38 @@
+name: Validate plugin
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Structural checks (no model calls)
+        run: npx -y @anthropic-ai/claude-code plugin validate --strict .
+      - name: Pinned versions in skills match versions.json
+        shell: bash
+        run: |
+          set -euo pipefail
+          alp=$(jq -r '.alpinejs.latest' versions.json)
+          h2=$(jq -r '."htmx.org".latest' versions.json)
+          h4=$(jq -r '."htmx.org".next' versions.json)
+          fail=0
+          for pin in "alpinejs@$alp" "@alpinejs/focus@$alp" "htmx.org@$h2" "htmx.org@$h4"; do
+            if ! grep -rq --include='*.md' -- "$pin" skills; then echo "::error::no skill pins $pin"; fail=1; fi
+          done
+          # Catch stale pins for the same packages at other versions
+          while read -r pin; do
+            case "$pin" in
+              alpinejs@"$alp"|@alpinejs/*@"$alp"|htmx.org@"$h2"|htmx.org@"$h4") ;;
+              *) echo "::error::stale pin $pin in skills/"; fail=1 ;;
+            esac
+          done < <(grep -rhoE --include='*.md' '(alpinejs|@alpinejs/[a-z]+|htmx\.org)@[0-9]+\.[0-9]+\.[0-9]+' skills | sort -u)
+          exit $fail

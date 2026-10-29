@@ -79,6 +79,18 @@ agents/
 evals/                   # claude plugin eval cases
 ```
 
+## Keeping it current
+
+Version drift is the main way a guidance plugin goes stale, so the repository automates the check:
+
+| Workflow | Trigger | What it does |
+|----------|---------|--------------|
+| `framework-versions.yml` | Weekly, or manual | Compares `versions.json` with the npm dist-tags for `alpinejs` and `htmx.org` (`latest` and `next`). When one moved, runs Claude Code with a scoped prompt and no git access: it reads the release notes between the two versions, updates pinned versions and only the guidance the notes justify, bumps `plugin.json`, adds a changelog entry, validates, and writes a PR body. A separate step opens the pull request for human review. |
+| `validate.yml` | Push to `main`, pull requests | `claude plugin validate --strict` plus a check that every CDN pin in `skills/` matches `versions.json`. No model calls. |
+| `evals.yml` | Manual only | Runs `claude plugin eval` with a cost ceiling and uploads the report. Bills real usage. |
+
+The upgrade and eval workflows need a `CLAUDE_CODE_OAUTH_TOKEN` repository secret (what `/install-github-app` creates for a subscription) or `ANTHROPIC_API_KEY`; swap the input line in the workflow if you use the latter. Pull requests opened by the upgrade workflow use the default `GITHUB_TOKEN`, so `validate.yml` will not run on them automatically; push an empty change or run it manually if you want the check before merging.
+
 ## Privacy
 
 The plugin is static Markdown only: no hooks, no MCP servers, no network calls, no telemetry. See [PRIVACY.md](PRIVACY.md).
