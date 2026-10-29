@@ -92,6 +92,8 @@ jobs:
 
             Work in the checked-out tree only. You have no git or GitHub access; a later workflow step commits whatever you change and opens the pull request. Do not touch evals/results/ or .github/.
 
+            Tools: read and search with Read, Glob and Grep, create and change files with Edit and Write, and fetch pages with WebFetch. Bash is allowed only for the validate command, run on its own: no pipes, `&&`/`||`, subshells, or redirection. Other Bash commands may be denied, so use the dedicated tools instead.
+
             Procedure:
             1. Read versions.json, CHANGELOG.md, .claude-plugin/plugin.json, and the SKILL.md of every skill under skills/ to see which versions and features the guidance currently claims.
             2. For each package whose version moved, read the release notes for every version between the old and the new one before changing any guidance:
@@ -100,8 +102,8 @@ jobs:
             3. Update every pinned version string in skills/ (CDN script tags, "current as of", version tables) and in versions.json to the new versions. Use Grep to find each occurrence of the old version strings.
             4. Change guidance only where a release note justifies it: a new directive, modifier, attribute, event, config key, plugin, or a documented behavior change. For each such change, keep a short note of the release-note line that justifies it. Do not add anything the release notes do not mention, and do not restate features that already appear in the files. Prefer leaving a file unchanged over guessing.
             5. Bump the version in .claude-plugin/plugin.json: patch if only version pins moved, minor if guidance changed. Add a dated entry at the top of CHANGELOG.md listing the version bump and each guidance change with its release-note citation.
-            6. Validate: run `claude plugin validate --strict .`; if the claude command is not on PATH run `npx -y @anthropic-ai/claude-code plugin validate --strict .`. Fix anything it reports.
-            7. Write PR_BODY.md at the repository root in this shape:
+            6. Validate: run `claude plugin validate --strict .` as a command by itself. If it fails because `claude` is not on PATH, run `npx -y @anthropic-ai/claude-code plugin validate --strict .` as a separate command. Fix anything it reports.
+            7. Write PR_BODY.md at the repository root with the Write tool, in this shape:
                ## Framework versions
                (the version lines above)
                ## Changes
