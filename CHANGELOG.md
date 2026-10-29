@@ -10,11 +10,11 @@ Full audit against the current Claude Code plugin standards and the current stat
 - Added a 1024px listing icon.
 - Removed the undocumented `version` field from both `SKILL.md` frontmatters.
 - Reviewer agent: replaced the `<example>` description blocks with plain "use proactively" wording, preloads both skills via `skills:`, and now detects which htmx line a project uses before reviewing.
-- Added an `evals/` suite (four cases) for `claude plugin eval`; `evals/results/` is git-ignored.
+- Added an `evals/` suite (six cases) for `claude plugin eval`; `evals/results/` is git-ignored.
 
 ### htmx skill
 - Now covers **htmx 4.0.0** (stable 2026-08-28) alongside **htmx 2.0.11**, with a version-detection step and side-by-side tables: explicit `:inherited` inheritance, `htmx:phase:action` event names and `event.detail.ctx`, 4xx/5xx swapping by default and `hx-status`, built-in `innerMorph`/`outerMorph`, `<hx-partial>`, HCON, renamed attributes (`hx-disabled-elt`→`hx-disable`, `hx-disable`→`hx-ignore`, `hx-request`→`hx-config`), removed attributes, config renames, `HX-Source`/`HX-Request-Type` headers, the end of the 286 polling convention, and the extension model (`dist/ext/*.js`, no `hx-ext`).
-- New `references/htmx-4-migration.md` with the upgrade workflow and compatibility bridges.
+- New task-shaped skills following htmx's own guidance split: `htmx-upgrade` (2.x to 4 migration workflow, `argument-hint` for the project path, with the rename tables in `references/htmx-4-migration.md`) and `htmx-debug` (lifecycle checklist and symptom-to-cause guide for both lines).
 - 2.x coverage updated through 2.0.11: `<hx-partial>`, `inherit` keyword, sessionStorage history cache, `reportValidityOfForms`, current extension package names and versions, `responseHandling`.
 - Patterns rewritten for both lines (search, inline edit, infinite scroll, polling/load polling, validation errors, SSE, WebSockets, CSRF, modals, optimistic UI).
 

@@ -1,6 +1,6 @@
 # alpine-htmx
 
-A Claude Code plugin with expert guidance for **Alpine.js v3** and **htmx** (both the 2.x line and htmx 4), the lightweight hypermedia-driven frontend stack. Two skills teach Claude the frameworks in depth; one agent reviews what gets written.
+A Claude Code plugin with expert guidance for **Alpine.js v3** and **htmx** (both the 2.x line and htmx 4), the lightweight hypermedia-driven frontend stack. Four skills teach Claude the frameworks in depth; one agent reviews what gets written.
 
 ## Install
 
@@ -24,9 +24,11 @@ From a shell: `claude plugin marketplace add cyface/alpine-htmx-claude-plugin &&
 | Skill | Loads when you… | Covers |
 |-------|-----------------|--------|
 | `alpine-js` | write `x-data`, `x-show`, `@click`, ask for a modal, dropdown, tabs, toast, wizard, filter, or mention Alpine stores, plugins, or the CSP build | All 18 core directives and 9 magics with current modifiers, `Alpine.data`/`store`/`bind`, the nine official plugins (Focus, Collapse, Intersect, Resize, Persist, Mask, Anchor, Morph, Sort), the rewritten CSP build, accessible component patterns |
-| `htmx` | write `hx-get`/`hx-post`/`hx-swap`/`hx-trigger`, ask for AJAX without a framework, active search, infinite scroll, polling, SSE/WebSockets, `HX-*` headers, CSRF, or a 2→4 migration | Both supported lines side by side: attributes, swap and trigger grammar, `<hx-partial>`, OOB swaps, events, config, headers, extensions, security, server-side checklist, and a step-by-step htmx 2 to 4 migration guide |
+| `htmx` | write `hx-get`/`hx-post`/`hx-swap`/`hx-trigger`, ask for AJAX without a framework, active search, infinite scroll, polling, SSE/WebSockets, `HX-*` headers, CSRF | Both supported lines side by side: attributes, swap and trigger grammar, `<hx-partial>`, OOB swaps, events, config, headers, extensions, security, server-side checklist |
+| `htmx-upgrade` | ask to migrate or upgrade to htmx 4, or ask what broke after bumping the script tag | Decision guidance, the shipped `upgrade-check` CLI, ordered rename steps, explicit inheritance, event/config/header renames, extension rewrites, compatibility bridges |
+| `htmx-debug` | describe a request that never fires, a swap that lands wrong or kills Alpine state, a listener that never runs, polling that will not stop, a CSRF 403 | Fact-finding checklist (version, processing, network, event logging for both lines) and a symptom-to-cause guide |
 
-Both skills cover **Alpine + htmx integration**: which library owns what, keeping Alpine state across swaps, and the event-name differences between htmx 2 (`@htmx:after-request`) and htmx 4 (`@htmx:after:request`).
+The `alpine-js` and `htmx` skills both cover **Alpine + htmx integration**: which library owns what, keeping Alpine state across swaps, and the event-name differences between htmx 2 (`@htmx:after-request`) and htmx 4 (`@htmx:after:request`).
 
 ### Agent
 
@@ -36,7 +38,7 @@ Both skills cover **Alpine + htmx integration**: which library owns what, keepin
 
 ### Evals
 
-`evals/` holds four cases for `claude plugin eval` (accessible modal, debounced active search, Alpine+htmx modal form, reviewer catching XSS/CSRF). Run them from the repo root:
+`evals/` holds six cases for `claude plugin eval` (accessible modal, debounced active search, Alpine+htmx modal form, reviewer catching XSS/CSRF, htmx 4 inheritance debugging, 2-to-4 migration). Run them from the repo root:
 
 ```bash
 claude plugin eval .            # runs each case with and without the plugin and reports the delta
@@ -64,9 +66,14 @@ skills/
 ├── alpine-js/
 │   ├── SKILL.md
 │   └── references/      # alpine-directives.md, alpine-plugins.md, alpine-patterns.md
-└── htmx/
-    ├── SKILL.md
-    └── references/      # htmx-attributes.md, htmx-patterns.md, htmx-4-migration.md
+├── htmx/
+│   ├── SKILL.md
+│   └── references/      # htmx-attributes.md, htmx-patterns.md
+├── htmx-upgrade/
+│   ├── SKILL.md
+│   └── references/      # htmx-4-migration.md
+└── htmx-debug/
+    └── SKILL.md
 agents/
 └── alpine-htmx-reviewer.md
 evals/                   # claude plugin eval cases

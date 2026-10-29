@@ -11,7 +11,7 @@
     {
       "name": "alpine-htmx",
       "source": "./",
-      "description": "Expert guidance for Alpine.js v3 and htmx (2.x and 4), plus a proactive code reviewer for anti-patterns, accessibility, and security.",
+      "description": "Expert guidance for Alpine.js v3 and htmx (2.x and 4), an htmx 2-to-4 upgrade skill, an htmx debugging skill, and a proactive code reviewer for anti-patterns, accessibility, and security.",
       "category": "development",
       "tags": ["alpine.js", "htmx", "hypermedia", "frontend", "accessibility"]
     }
