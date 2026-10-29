@@ -1,14 +1,16 @@
 ---
 name: htmx-upgrade
 description: >-
-  Step-by-step migration of a codebase from htmx 2.x to htmx 4. Use whenever the
-  user asks to upgrade, migrate, port, or modernize htmx, mentions htmx 4 or
-  "the fetchening", asks why their htmx code broke after bumping the script tag,
-  wants an inventory of what would change, or asks whether they should move to
-  htmx 4 at all. Covers attribute renames, explicit :inherited inheritance,
-  event-name and event.detail changes, config and header renames, 4xx/5xx
-  swapping, extension rewrites, and the compatibility bridges. For writing new
-  htmx markup use the htmx skill; for diagnosing a specific failure use htmx-debug.
+  Step-by-step migration of a codebase from htmx 2.x to htmx 4. Use this skill
+  whenever the user asks to upgrade, migrate, port, convert or modernize htmx
+  code, mentions htmx 4 or "the fetchening", pastes a template asking for the
+  htmx 4 version, asks what would change or whether they should move to htmx 4
+  at all, or asks why things broke after bumping to 4 and wants the whole
+  codebase fixed rather than one symptom diagnosed. Covers the shipped
+  upgrade-check CLI, attribute renames in the right order, explicit :inherited
+  inheritance, event-name and event.detail changes, config and header renames,
+  4xx/5xx swapping, extension rewrites, and the compatibility bridges. For
+  writing new htmx markup use the htmx skill; for one failing page use htmx-debug.
 argument-hint: "[path to templates or project root]"
 ---
 

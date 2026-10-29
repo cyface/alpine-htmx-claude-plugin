@@ -6,8 +6,11 @@ description: >-
   misuse, and Alpine+htmx integration mistakes such as camelCase htmx event
   names or x-data placed on the swap target. Use proactively after writing or
   modifying any file that contains x-data/x-show/x-for/@click or hx-get/hx-post/
-  hx-target/hx-swap/hx-trigger, and whenever the user asks for a review, audit,
-  or sanity check of Alpine or htmx code. Distinguishes htmx 2.x from htmx 4.
+  hx-target/hx-swap/hx-trigger. ALWAYS delegate to this agent, rather than
+  reviewing inline, when the user asks to review, audit, check, sanity-check or
+  "look over" code that uses Alpine or htmx, including snippets pasted into the
+  chat: it works through fixed checklists for both htmx lines and reports by
+  severity with fixes, which an inline review tends to skip.
 tools: Read, Grep, Glob
 model: inherit
 color: yellow

@@ -1,14 +1,18 @@
 ---
 name: htmx-debug
 description: >-
-  Diagnose htmx problems: a request that never fires, a swap that does not
-  happen or lands in the wrong place, content that swaps but loses its Alpine
-  state or event handlers, an htmx: listener that never runs, polling that will
-  not stop, CSRF 403s, extensions that seem inactive, history/back-button
-  oddities, or anything that "worked on htmx 2 and broke on htmx 4". Use
-  whenever the user describes unexpected htmx behavior, pastes an htmx snippet
-  asking why it does not work, or asks how to see what htmx is doing. For
-  writing new markup use the htmx skill; for a planned migration use htmx-upgrade.
+  Diagnose htmx problems. Use this skill whenever a user reports htmx behaving
+  unexpectedly, even when the cause looks obvious, because the checklist
+  separates htmx 2.x from htmx 4 symptoms (inheritance, event names, error
+  swapping, polling) that are easy to misattribute. Trigger on: a request that
+  never fires, a swap that does not happen or lands in the wrong element, content
+  that swaps but loses Alpine state or event handlers, an htmx: listener that
+  never runs, a toast or callback that stopped working, polling that will not
+  stop, CSRF 403s, an extension that seems inactive, back-button oddities, or
+  anything that "worked on htmx 2 and broke on htmx 4" or "broke after bumping
+  the script tag". Also use when the user pastes an htmx snippet asking why it
+  does not work or asks how to see what htmx is doing. For writing new markup use
+  the htmx skill; for a planned migration use htmx-upgrade.
 argument-hint: "[description of the problem]"
 ---
 

@@ -1,15 +1,17 @@
 ---
 name: alpine-js
 description: >-
-  Alpine.js v3 (3.17.x) guidance for building reactive UI directly in HTML.
-  Use whenever the user writes or edits markup containing x-data, x-show, x-model,
-  x-for, @click or :class, asks for a dropdown, modal, tabs, accordion, toggle,
-  toast, wizard, client-side filter or any other "sprinkle of interactivity" on a
-  server-rendered page, mentions Alpine stores, Alpine.data components, x-cloak
-  flashes, the CSP build, or an Alpine plugin (focus/x-trap, collapse, intersect,
-  persist, mask, anchor, morph, sort, resize). Also use when Alpine is combined
-  with htmx, Django, Flask, Rails, Laravel/Livewire or Phoenix templates, even if
-  the user does not say "Alpine" but the page already uses it.
+  Alpine.js v3 (3.17.x) guidance for reactive UI written directly in HTML. Use this
+  skill BEFORE writing or editing any Alpine markup, even a small snippet you could
+  write from memory: it carries version-specific rules (template-only directives,
+  :key, x-cloak CSS, x-trap focus handling, plugin load order, the rewritten CSP
+  build, htmx 2 vs 4 event names) that training data frequently gets wrong. Trigger
+  on x-data, x-show, x-model, x-for, @click, :class, Alpine.data, Alpine.store,
+  $dispatch, x-trap, x-collapse, x-anchor, and on requests for a dropdown, modal,
+  dialog, tabs, accordion, toggle, toast, wizard, client-side filter, or any
+  "sprinkle of interactivity" on a server-rendered page, including Django, Flask,
+  Rails, Laravel/Livewire or Phoenix templates that already use Alpine even when
+  the user does not name it. Also use when Alpine is combined with htmx.
 ---
 
 # Alpine.js v3 Development Guide
