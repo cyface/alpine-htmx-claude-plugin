@@ -1,0 +1,19 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "cyface",
+  "description": "Claude Code plugins by Tim White (cyface)",
+  "owner": {
+    "name": "Tim White",
+    "email": "tim@cyface.com",
+    "url": "https://github.com/cyface"
+  },
+  "plugins": [
+    {
+      "name": "alpine-htmx",
+      "source": "./",
+      "description": "Expert guidance for Alpine.js v3 and htmx (2.x and 4), plus a proactive code reviewer for anti-patterns, accessibility, and security.",
+      "category": "development",
+      "tags": ["alpine.js", "htmx", "hypermedia", "frontend", "accessibility"]
+    }
+  ]
+}
