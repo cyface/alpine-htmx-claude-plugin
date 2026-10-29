@@ -48,7 +48,7 @@ htmx 4 is a ground-up rewrite (fetch-based, explicit inheritance, new event name
 
 ## Step 3: make inheritance explicit
 
-In 2.x every child inherited `hx-target`, `hx-swap`, `hx-include`, `hx-headers`, `hx-confirm`, `hx-indicator`, `hx-boost`, `hx-sync`, `hx-encoding`, `hx-push-url`, `hx-select`, `hx-vals`, `hx-config`, `hx-validate` from ancestors. In 4 the ancestor must say so:
+In 2.x every child inherited `hx-target`, `hx-swap`, `hx-include`, `hx-headers`, `hx-confirm`, `hx-indicator`, `hx-boost`, `hx-sync`, `hx-encoding`, `hx-push-url`, `hx-select`, `hx-vals`, `hx-request` (now `hx-config`), `hx-validate` from ancestors. In 4 the ancestor must say so:
 
 ```html
 <!-- 2.x -->
@@ -152,7 +152,7 @@ Removed with no equivalent: `refreshOnHistoryMiss`, `historyCacheSize`, `default
 
 ## Step 9: extensions
 
-Core 4 extensions (same package, `dist/ext/`): `hx-sse`, `hx-ws`, `hx-multipart`, `hx-preload`, `hx-ptag`, `hx-history-cache`, `hx-head` (was `head-support`), `hx-prompt`, `hx-pending`, `hx-browser-indicator`, `hx-live`, `hx-upsert`, `hx-targets`, `hx-download`, `hx-alpine-compat`, `hx-csp`, `htmx-2-compat`. Morphing is built in (`hx-swap="outerMorph"`), so drop `idiomorph`/`alpine-morph` (load `hx-alpine-compat` to carry Alpine state through morphs). `response-targets` becomes `hx-status:*`. `sse-connect`/`sse-swap`/`ws-connect`/`ws-send` become `hx-sse:connect`, `hx-trigger="<event> from:body"`, `hx-ws:connect`, `hx-ws:send` (old names still work with a warning).
+Core 4 extensions (same package, `dist/ext/`): `hx-sse`, `hx-ws`, `hx-multipart`, `hx-preload`, `hx-ptag`, `hx-history-cache`, `hx-head` (was `head-support`), `hx-prompt`, `hx-pending`, `hx-browser-indicator`, `hx-live`, `hx-upsert`, `hx-targets`, `hx-download`, `hx-alpine-compat`, `hx-csp`, `htmx-2-compat`. Morphing is built in (`hx-swap="outerMorph"`), so drop `idiomorph`/`alpine-morph` (load `hx-alpine-compat` to carry Alpine state through morphs). `response-targets` becomes `hx-status:*`. `sse-connect`/`sse-close`/`ws-connect`/`ws-send` become `hx-sse:connect`/`hx-sse:close`/`hx-ws:connect`/`hx-ws:send` (the old names still work with a warning); `sse-swap` is removed (it warns and does nothing) and becomes `hx-trigger="<event> from:body"` plus a request, or a streaming `hx-get`.
 
 Custom extensions must be rewritten against the hook API:
 
@@ -182,4 +182,4 @@ Optional allow-list: `<meta name="htmx-config" content='{"extensions": "sse, my-
 - `htmx.config.logAll = true` in the console and exercise each interaction; check `htmx:error` events.
 - Confirm CSRF headers still arrive (the most common post-migration 403 is a missing `:inherited`).
 - Confirm error responses render as intended now that 4xx/5xx swap.
-- Confirm any `every` polling stops the way you expect.
+- Confirm any `every` polling stops the way you expect, and that filters use the `every[filter] 5s` form 4.0.0 actually parses.

@@ -199,6 +199,7 @@ Server behavior:
 ```html
 <!-- Fixed interval; stops when the tab is hidden -->
 <div hx-get="/status" hx-trigger="every 5s [!document.hidden]" hx-swap="innerHTML">Status: active</div>
+<!-- 4.0.0 parses the filter only on the event token: hx-trigger="every[!document.hidden] 5s" -->
 
 <!-- Load polling: the fragment re-requests itself until the server stops rendering the trigger -->
 <div hx-get="/jobs/123" hx-trigger="load delay:2s" hx-swap="outerHTML">
@@ -207,7 +208,7 @@ Server behavior:
 <!-- When the job is done the server returns the final markup WITHOUT hx-trigger, and polling ends. -->
 ```
 
-Stopping an `every` poll: **2.x** responds with status **286** (content swapped, polling stopped). **4** has no 286; use load polling, a filter (`every 2s [!document.querySelector('.done')]`), or replace the polling element. The `hx-ptag` extension (4) lets the server skip unchanged responses.
+Stopping an `every` poll: **2.x** responds with status **286** (content swapped, polling stopped). **4** has no 286; use load polling, a filter (`every[!document.querySelector('.done')] 2s`), or replace the polling element. The `hx-ptag` extension (4) lets the server skip unchanged responses.
 
 ---
 
@@ -239,7 +240,7 @@ Alpine updates immediately; htmx sends the request; the error handler reverts. K
 ```
 
 - **2.x**: the `htmx-swapping` class is applied during the delay, so `tr.htmx-swapping { opacity: 0; transition: opacity 400ms }` fades the row out. Return 200 with an empty body.
-- **4**: settling classes are gone. Use `hx-swap="outerHTML transition:true"` with a View Transition (`::view-transition-old(row)`), or animate with Alpine before the request.
+- **4**: works the same (`htmx-swapping` is applied before the `swap:` delay); the class names are no longer configurable. `hx-swap="outerHTML transition:true"` with a View Transition is the alternative.
 
 ---
 
@@ -284,7 +285,7 @@ Server response (Alpine owns the open/close state; focus plugin for the trap):
 </div>
 ```
 
-On a 422 the server re-renders the form; with **4** it swaps automatically into `#item-5` unless you add `hx-status:422="target:closest form"` (or `hx-target="closest form"` on the form and let success use `HX-Retarget: #item-5`). With **2.x** use `response-targets` or return 200 for the error form. Clear `#modal` after closing (`@htmx:after-request` can also empty it, or swap the response into `#modal` with `hx-swap="innerHTML"` and return nothing).
+On a 422 the server re-renders the form; with **4** it swaps automatically into `#item-5` unless you add `hx-status:422="target:'closest form'"` (or `hx-target="closest form"` on the form and let success use `HX-Retarget: #item-5`). With **2.x** use `response-targets` or return 200 for the error form. Clear `#modal` after closing (`@htmx:after-request` can also empty it, or swap the response into `#modal` with `hx-swap="innerHTML"` and return nothing).
 
 ---
 

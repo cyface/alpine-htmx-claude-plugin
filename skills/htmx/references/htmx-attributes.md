@@ -57,7 +57,7 @@ Default target is the element itself. **2.x** inherits `hx-target` from ancestor
 | Style | Effect |
 |-------|--------|
 | `innerHTML` | Replace children (default; config `defaultSwapStyle` in 2.x, `defaultSwap` in 4) |
-| `outerHTML` | Replace the element (2.x downgrades to `innerHTML` on `<body>`; 4 treats body as `outerSync`) |
+| `outerHTML` | Replace the element (2.x downgrades to `innerHTML` on `<body>`; 4 treats `outerHTML` on body as `outerSync`) |
 | `textContent` | Set text only |
 | `beforebegin` / `afterbegin` / `beforeend` / `afterend` | Insert around or inside; **4** aliases `before` / `prepend` / `append` / `after` |
 | `delete` | Remove the target regardless of response |
@@ -74,7 +74,7 @@ Modifiers (space-separated after the style):
 | `settle:<time>` | Delay before settle (default 20ms) | Default 1ms |
 | `transition:true` | View Transitions API | Same (global: `globalViewTransitions` → `transitions`) |
 | `ignoreTitle:true` | Keep the page `<title>` | Same |
-| `scroll:top|bottom` | Scroll the target; `scroll:#el:bottom` for another element | `scroll:top|bottom` plus `scrollTarget:<sel>`; `scroll:window:top` |
+| `scroll:top|bottom` | Scroll the target; `scroll:#el:bottom` for another element | `scroll:top|bottom` plus `scrollTarget:<sel>` (the documented `scroll:window:top` is not honored by 4.0.0) |
 | `show:top|bottom|none` | Scroll target into view; `show:#el:top`, `show:window:top` | `show:…` plus `showTarget:<sel>` |
 | `focus-scroll:true|false` | Scroll to the focused element | Renamed `focusScroll:true` |
 | `strip:true|false` | — | Drop (or keep) the response's outer wrapper element |
@@ -83,7 +83,7 @@ Modifiers (space-separated after the style):
 
 **4** morph controls: `hx-morph-skip`, `hx-morph-skip-children` attributes; config `morphIgnore` (default `["data-htmx-powered"]`), `morphSkip`, `morphSkipChildren`, `morphScanLimit`.
 
-Settling classes `htmx-added`, `htmx-settling`, `htmx-swapping` exist in **2.x** only (use them for CSS exit animations with `swap:500ms`). `htmx-request` and `htmx-indicator` exist in both.
+The classes `htmx-swapping` (during the `swap:` delay), `htmx-added` and `htmx-settling` exist in both lines and drive CSS exit/enter animations with `swap:500ms`; only the **2.x** config keys that rename them (`swappingClass`, `addedClass`, `settlingClass`, `attributesToSettle`) were removed in 4. `htmx-request` and `htmx-indicator` exist in both.
 
 ---
 
@@ -95,8 +95,8 @@ hx-trigger="input changed delay:300ms"
 hx-trigger="submit, keyup[key=='Enter']"
 hx-trigger="load"
 hx-trigger="revealed"
-hx-trigger="intersect once threshold:0.5"      <!-- 4 adds root:<sel> and rootMargin: -->
-hx-trigger="every 10s [!document.hidden]"
+hx-trigger="intersect once root:#scroller threshold:0.5"   <!-- 4 adds rootMargin: -->
+hx-trigger="every 10s [!document.hidden]"      <!-- 2.x form; in 4.0.0 write every[!document.hidden] 10s, see below -->
 hx-trigger="contactsChanged from:body"          <!-- paired with the HX-Trigger response header -->
 ```
 
@@ -116,7 +116,7 @@ Selectors containing spaces or commas: **2.x** wraps them in parentheses or brac
 
 Filters are JavaScript in brackets (`click[ctrlKey && !shiftKey]`) and need `eval` (see CSP under Security in SKILL.md).
 
-Polling: `every <t> [filter]`. **2.x** stops when the server answers **286**. **4** stops only when the polling element leaves the DOM, the filter is false, or you dispatch `htmx:abort` on it.
+Polling: **2.x** `every 5s [filter]`; **4.0.0** parses the filter only on the event token, `every[filter] 5s` (the documented `every 5s [filter]` form is silently ignored). **2.x** stops when the server answers **286**. **4** stops only when the polling element leaves the DOM or the filter is false; `htmx:abort` cancels the in-flight fetch but not the interval, so load polling (re-render without the trigger) is the reliable stop.
 
 ---
 
@@ -165,14 +165,14 @@ Run HTML5 validation before a non-form element's request. **2.x** also fires `ht
 | Stop htmx processing a subtree | `hx-disable` | **`hx-ignore`** (renamed) |
 | `hx-push-url="true|<url>|false"` | ✓ | ✓ |
 | `hx-replace-url` | ✓ | ✓ |
-| `hx-boost="true"` | Boosts descendants automatically; `hx-boost="false"` opts out | Needs `hx-boost:inherited="true"` for descendants; per-element overrides `hx-boost="swap:beforeend target:#modals select:#main"`; links swap `outerSync` into `<body>` |
+| `hx-boost="true"` | Boosts descendants automatically; `hx-boost="false"` opts out | Needs `hx-boost:inherited="true"` for descendants; per-element overrides `hx-boost="swap:beforeend target:#modals select:#main"`; responses replace the `<body>` content (docs describe this as `outerSync`) |
 | `hx-preserve` | Keep an element across swaps (by id) | Same; `hx-preserve="true"` also survives boosted navigations |
 | `hx-prompt="text"` | Sends the answer as `HX-Prompt` | Moved to the `hx-prompt` extension |
 | `hx-history="false"` | Exclude the page from the history cache | Only meaningful with the `hx-history-cache` extension |
 | `hx-history-elt` | Element snapshotted for history | ✓ |
 | `hx-request='{"timeout":5000}'` | Per-element request options | Renamed `hx-config` (HCON): `timeout`, `credentials`, `cache`, `redirect`, `referrer`, `integrity`, `validate` |
 
-Not boosted in either version: cross-origin links, `#` anchors, `download`, `target="_blank"`.
+Not boosted in either version: cross-origin links, `#` anchors, `target="_blank"`; 4 also skips `download` links.
 
 ---
 
@@ -187,7 +187,7 @@ Not boosted in either version: cross-origin links, `#` anchors, `download`, `tar
 | `replace` | Abort the in-flight request and issue the new one |
 | `queue first` / `queue last` / `queue all` | Queue requests |
 
-Same in both lines. `hx-sync:inherited` in **4** to apply to descendants.
+Same syntax in both lines; `hx-sync:inherited` in **4** to apply to descendants. Note that 4.0.0 queues repeat requests from the same element (`queue first`) when no strategy is given, where 2.x runs them concurrently, so set the strategy explicitly when it matters.
 
 ---
 
@@ -211,7 +211,7 @@ Same in both lines. `hx-sync:inherited` in **4** to apply to descendants.
 
 - The target id must already exist in the page.
 - Wrap `<tr>`, `<td>`, `<li>` and similar in `<template>` so the HTML parser does not drop them.
-- Order: **2.x** OOB swaps run *before* the main swap; **4** runs the main swap first, then OOB and partials in document order. **4** skips the (empty) main swap when the response is OOB-only unless `swapEmpty:true` / `allowEmptySwapAfterOOB`.
+- Order: **2.x** OOB swaps run *before* the main swap; **4** runs the main swap first, then `hx-select-oob` and `hx-swap-oob` elements, then `<hx-partial>`s. **4** skips the (empty) main swap when the response is OOB-only unless `swapEmpty:true` / `allowEmptySwapAfterOOB`.
 
 ### hx-select-oob (on the requesting element)
 
@@ -222,10 +222,10 @@ Pick elements out of the response and OOB-swap them: `hx-select-oob="#count, #to
 ```html
 <hx-partial hx-target="#messages" hx-swap="beforeend">…</hx-partial>
 <hx-partial id="count">7</hx-partial>                     <!-- id= is shorthand for hx-target="#count" -->
-<template hx-type="partial" hx-target="closest li">…</template>   <!-- table/list-safe fallback -->
+<template hx type="partial" hx-target="closest li">…</template>   <!-- table/list-safe fallback (the source matches template[hx][type=partial]; docs write hx-type) -->
 ```
 
-`hx-target` resolves relative to the triggering element, so `closest tr` and `next .error` work. Default swap `innerHTML`. A partial-only response never performs the main swap. **2.x** processes partials before the main swap and fires `htmx:partialBeforeSwap` / `htmx:partialAfterSwap` / `htmx:partialErrorNoTarget`.
+`hx-target` resolves relative to the triggering element, so `closest tr` and `next .error` work. Default swap `innerHTML`. A partial-only response skips the main swap unless `swapEmpty:true` is set. **2.x** processes partials before the main swap and fires `htmx:partialBeforeSwap` / `htmx:partialAfterSwap` / `htmx:partialErrorNoTarget`.
 
 ---
 
@@ -318,7 +318,8 @@ Set via `<meta name="htmx-config" content='{…}'>` (4 also accepts HCON: `conte
 | `responseHandling` array | `noSwap` `[204, 304]` | add `'4xx','5xx'` to restore 2.x |
 | `attributesToSettle`, `addedClass`, `settlingClass`, `swappingClass` | removed | |
 | `withCredentials`, `getCacheBusterParam`, `methodsThatUseUrlParams`, `scrollBehavior`, `scrollIntoViewOnBoost`, `ignoreTitle`, `triggerSpecsCache`, `useTemplateFragments`, `wsReconnectDelay`, `wsBinaryType`, `historyRestoreAsHxRequest`, `reportValidityOfForms` | removed | |
-| `indicatorClass`, `requestClass`, `defaultFocusScroll`, `allowNestedOobSwaps` | same | |
+| `indicatorClass`, `requestClass`, `defaultFocusScroll` | same | |
+| `allowNestedOobSwaps` true | removed | |
 | — | `prefix` `"data-hx-"` (additive), `metaCharacter`, `extensions` (whitelist), `logAll`, `allowEmptySwapAfterOOB`, `morph*` | |
 
 ---
@@ -346,13 +347,13 @@ Response (server → browser): `HX-Trigger` (event name or JSON `{"evt": detail}
 
 | 2.x | 4 |
 |-----|---|
-| `htmx.ajax('GET', '/url', { target, swap, values })` | same, returns a Promise |
+| `htmx.ajax('GET', '/url', { target, swap, values })` returns a Promise | same |
 | `htmx.process(el)` | same (needed for markup inserted by Alpine or other JS) |
 | `htmx.on/off`, `htmx.trigger`, `htmx.find/findAll`, `htmx.onLoad` | `htmx.on`, `htmx.trigger`, `htmx.find/findAll`, `htmx.onLoad` (`off` removed: use `removeEventListener`) |
 | `htmx.addClass/removeClass/toggleClass/takeClass`, `htmx.closest`, `htmx.remove`, `htmx.values` | removed: use `classList`, `el.closest`, `el.remove()`, `new FormData(form)` |
 | `htmx.defineExtension` | `htmx.registerExtension` |
 | `htmx.logger`, `htmx.logAll()` | `htmx.config.logAll = true` |
-| — | `htmx.swap(ctx)`, `htmx.timeout(ms)`, `htmx.initialize()`, `htmx.parseInterval` |
+| `htmx.parseInterval` | same, plus `htmx.swap(ctx)`, `htmx.timeout(ms)`, `htmx.initialize()` |
 
 ---
 
@@ -368,7 +369,7 @@ Separate packages, loaded after core and enabled with `hx-ext` (inherited; `hx-e
 ```
 
 Core (maintained by the htmx team): `head-support`, `htmx-1-compat`, `idiomorph` (`hx-ext="morph"`, `hx-swap="morph"`), `preload`, `response-targets`, `sse`, `ws`.
-Community (notable): `alpine-morph`, `class-tools`, `json-enc`, `loading-states`, `path-deps`, `remove-me`, `multi-swap`, `client-side-templates`, `restored`, `safe-nonce`. `loading-states` and `path-deps` are low-activity; prefer `hx-disabled-elt`/`hx-indicator` and `HX-Trigger` + `hx-trigger="evt from:body"`.
+Community (notable): `alpine-morph`, `class-tools`, `json-enc`, `loading-states`, `path-deps`, `remove-me`, `multi-swap`, `client-side-templates`, `restored`, `safe-nonce`. `loading-states` and `path-deps` have no htmx 4 port; core `hx-disabled-elt`/`hx-indicator` and `HX-Trigger` + `hx-trigger="evt from:body"` cover the same needs portably.
 
 ### 4
 
