@@ -75,6 +75,7 @@ jobs:
           fetch-depth: 1
 
       - name: Update the plugin with Claude Code
+        id: claude
         uses: anthropics/claude-code-action@v1
         with:
           # /install-github-app saves a subscription token as CLAUDE_CODE_OAUTH_TOKEN.
@@ -109,6 +110,16 @@ jobs:
                (anything you were unsure about, including release-note items you deliberately did not act on and why)
             The pull request body is read from that file and the file is removed before committing.
 
+      # The action hides Claude's transcript from the log (show_full_output is
+      # off), so keep it as an artifact to see tool calls and permission denials.
+      - name: Upload Claude transcript
+        if: always() && steps.claude.outputs.execution_file != ''
+        uses: actions/upload-artifact@v7
+        with:
+          name: claude-transcript
+          path: ${{ steps.claude.outputs.execution_file }}
+          retention-days: 14
+
       - name: Read PR body and remove it from the tree
         id: body
         shell: bash
@@ -122,7 +133,7 @@ jobs:
           fi
 
       - name: Open or update the pull request
-        uses: peter-evans/create-pull-request@v7
+        uses: peter-evans/create-pull-request@v8
         with:
           branch: chore/framework-versions
           delete-branch: true
