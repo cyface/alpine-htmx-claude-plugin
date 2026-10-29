@@ -4,17 +4,17 @@ description: >-
   htmx guidance covering both supported lines: htmx 2.x (npm "latest", supported
   indefinitely) and htmx 4 (stable since August 2026 with explicit :inherited
   attribute inheritance, colon event names, 4xx/5xx swapping, no hx-ext, no 286).
-  Use this skill BEFORE writing or editing any htmx markup, even one attribute,
-  because the two lines differ in ways that silently break code and the skill
-  starts by establishing which one the project uses. Trigger on hx-get, hx-post,
+  Use this skill BEFORE writing or editing any htmx markup, even one attribute:
+  the two lines differ in ways that silently break code, so the skill starts by
+  establishing which one the project uses. Trigger on hx-get, hx-post,
   hx-target, hx-swap, hx-trigger, hx-boost, hx-vals, hx-swap-oob, <hx-partial>,
   HX-* headers, and on requests for AJAX or partial page updates without a
   framework, search-as-you-type, infinite scroll, polling, inline editing,
   server-rendered modals, form submission without reload, SSE/WebSocket
   streaming, or CSRF with htmx, including Django, Flask, Rails, Laravel, Go or
   Phoenix templates that already use htmx even when the user does not name it.
-  Also use whenever htmx is paired with Alpine.js. For a failing page use
-  htmx-debug; for a 2-to-4 migration use htmx-upgrade.
+  Also use whenever htmx is paired with Alpine.js. Failing page: htmx-debug;
+  2-to-4 migration: htmx-upgrade.
 ---
 
 # htmx Development Guide
