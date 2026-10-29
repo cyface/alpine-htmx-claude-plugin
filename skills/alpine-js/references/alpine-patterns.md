@@ -68,7 +68,7 @@ Why each piece is there:
 
 ## Dropdown / popover
 
-Mirrors the official Alpine dropdown component. Add `@alpinejs/anchor` if the panel must escape a clipping container.
+Follows the structure of the official Alpine dropdown component (which names its id scope `dropdown-button`). Add `@alpinejs/anchor` if the panel must escape a clipping container.
 
 ```html
 <div x-data="{

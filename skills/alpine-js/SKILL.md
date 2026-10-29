@@ -69,7 +69,7 @@ Lifecycle events: `alpine:init` (register data, stores, directives, magics, bind
 
 ## Rules that prevent most Alpine bugs
 
-- **`x-for`, `x-if` and `x-teleport` must be on a `<template>` with exactly one root child.** Alpine warns in the console otherwise.
+- **`x-for`, `x-if` and `x-teleport` must be on a `<template>` with exactly one root child.** Alpine warns when they are not on a `<template>`; `x-for` (3.15.11+) also warns about extra roots, while `x-if`/`x-teleport` silently use only the first.
 - **Add `:key` to `x-for`** when items can be added, removed or reordered. Use a stable id, never the index.
 - **`x-transition` only works with `x-show`**, never `x-if`.
 - **`x-cloak` needs the CSS rule** `[x-cloak] { display: none !important; }` somewhere on the page, or it does nothing.
@@ -97,7 +97,7 @@ Lifecycle events: `alpine:init` (register data, stores, directives, magics, bind
 | `x-effect` | Reactive side effect | Runs immediately and on every change of what it read |
 | `x-ref` / `$refs` | Name an element | Works across `x-teleport` |
 | `x-cloak` | Hide until Alpine starts | Requires the CSS rule above |
-| `x-teleport` | Move content elsewhere in the DOM | On `<template>`; selector target; keeps scope; events re-dispatch on the template |
+| `x-teleport` | Move content elsewhere in the DOM | On `<template>`; selector target; keeps scope; listeners on the template receive forwarded events |
 | `x-ignore` | Skip a subtree | Use for third-party widgets that manage their own DOM |
 | `x-id` / `$id()` | Scoped unique ids | For `for`/`id`, `aria-controls`, `aria-labelledby` |
 | `x-transition` | Enter/leave animation | `.duration.300ms` `.opacity` `.scale.90` `.scale.origin.top` or the six class hooks |
@@ -169,7 +169,7 @@ Details, options and examples: **`references/alpine-plugins.md`**.
 Alpine and htmx coexist well because htmx swaps HTML and Alpine's MutationObserver initializes any `x-data` that arrives. The three things that go wrong:
 
 1. **State lost on swap.** Alpine state lives on the `x-data` element. If htmx swaps that element (or an ancestor) the state is recreated from scratch. Put `x-data` on a parent *above* the `hx-target`, or accept the reset and let the server render the initial state.
-2. **Wrong event name.** Alpine lowercases `@` listeners, so camelCase never matches. The correct spelling depends on the htmx line (check the script tag):
+2. **Wrong event name.** The HTML parser lowercases attribute names, so `@htmx:afterRequest` reaches Alpine as `@htmx:afterrequest` and never matches. The correct spelling depends on the htmx line (check the script tag):
    - **htmx 2.x** dispatches every event twice, camelCase and kebab-case. Use the kebab form: `@htmx:after-request`, `@htmx:response-error`, `@htmx:after-swap`. `@htmx:afterRequest` silently never fires.
    - **htmx 4** names are already lowercase and colon-separated, dispatched once: `@htmx:after:request`, `@htmx:response:error`, `@htmx:after:swap`. The kebab aliases are gone.
 3. **Alpine-rendered DOM being swapped.** Do not `hx-target` into something `x-for`/`x-if` controls; give htmx its own container.
@@ -203,7 +203,7 @@ Alpine and htmx coexist well because htmx swaps HTML and Alpine's MutationObserv
 
 ## CSP build
 
-`@alpinejs/csp` evaluates expressions without `eval`/`new Function`. Since 3.15 it has a real expression parser, so most markup works unchanged: object and array literals, property paths (`user.name`, `items[0]`), comparisons, `&&`/`||`/`!`, ternaries, string concatenation, assignments and `count++`, `x-model="user.name"`, and method calls on your data (`items.push(x)`). Not supported: arrow functions, template literals, destructuring, spread, nested property assignment (`user.name = 'x'`; call a method instead), globals (`window`, `document`, `Math`, `JSON`, `console`), and `x-html`. Keep anything non-trivial in `Alpine.data()` methods.
+`@alpinejs/csp` evaluates expressions without `eval`/`new Function`. Since 3.15 it has a real expression parser, so most markup works unchanged: object and array literals, property paths (`user.name`, `items[0]`), comparisons, `&&`/`||`/`!`, ternaries, string concatenation, assignments and `count++`, `x-model="user.name"`, and method calls on your data (`items.push(x)`). Not supported: arrow functions, template literals, destructuring, spread, globals (`window`, `document`, `Math`, `JSON`, `console`), and `x-html`. Nested property assignment (`user.name = 'x'`) works on plain data objects since 3.15.12 even though the docs still list it as unsupported; a method call is the portable choice. Keep anything non-trivial in `Alpine.data()` methods.
 
 ## Reference files
 

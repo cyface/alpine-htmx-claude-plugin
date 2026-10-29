@@ -157,7 +157,7 @@ Event names must be lowercase; kebab-case custom events are the convention.
 `.enter` `.escape` `.space` `.tab` `.up` `.down` `.left` `.right` `.shift` `.ctrl` `.cmd` `.meta` `.alt` `.caps-lock` `.equal` `.period` `.comma` `.slash`, plus any kebab-cased `KeyboardEvent.key` such as `.page-down` or `.arrow-down`.
 
 - Chain: `@keydown.ctrl.enter="submit()"`, `@keydown.shift.tab="prev()"`.
-- Multiple keys (3.13.10+): `@keyup.enter,space="activate()"`.
+- The `.comma` key modifier (for the `,` key) was added in 3.13.10.
 - `.shift` `.ctrl` `.cmd` `.meta` `.alt` also work on mouse events since 3.14: `@click.shift="rangeSelect()"`.
 
 ---
@@ -316,7 +316,7 @@ Alpine removes the attribute when it initializes the element. Without the CSS ru
 </div>
 ```
 
-Must be on `<template>`. The value is any `querySelector` selector (first match). Teleported content keeps `$refs`, `$root` and scope. Native events fired inside are re-dispatched on the `<template x-teleport>` element, so you can listen there. Nested teleports render as siblings.
+Must be on `<template>`. The value is any `querySelector` selector (first match). Teleported content keeps `$refs`, `$root` and scope. Events you listen for on the `<template x-teleport>` element itself (`<template x-teleport="body" @click=…>`) are forwarded to it and stopped from bubbling at the teleported node; other events bubble normally from where the content really lives. Nested teleports render as siblings.
 
 ---
 
@@ -329,7 +329,7 @@ Must be on `<template>`. The value is any `querySelector` selector (first match)
 <div x-ignore.self>   <!-- skips only this element's own directives, not children (exported, undocumented) -->
 ```
 
-Use for widgets that own their DOM (maps, editors) to avoid double initialization. To initialize later, remove the attribute and call `Alpine.initTree(el)`.
+Use for widgets that own their DOM (maps, editors) to avoid double initialization. To initialize later, remove the attribute, wait a tick (`await Alpine.nextTick()`) so the directive's cleanup clears the ignore flag, then call `Alpine.initTree(el)`.
 
 ---
 
@@ -383,7 +383,7 @@ Alpine.morph(el, html, options) / Alpine.morphBetween(startNode, endNode, html, 
 Alpine.$persist(value).as('key')              // persist plugin, for stores
 Alpine.start()                                // bundles only; exactly once
 Alpine.setErrorHandler((error, el, expression) => {})   // 3.15.2: central error reporting
-Alpine.interceptInit(el => { … })             // hook before each element initializes
+Alpine.interceptInit(el => { … })             // 3.11+: hook before each element initializes
 Alpine.deferInit(el, promise)                 // 3.17.0: suspend a subtree until the promise settles
 Alpine.initTree(el) / Alpine.destroyTree(el)  // manual (re)initialization, e.g. after x-ignore
 Alpine.raw(proxy)                             // unwrap a reactive proxy (exported, undocumented)
@@ -425,4 +425,4 @@ Must be registered synchronously (from `interceptInit` or on an already-initiali
 
 Supported in expressions: literals, property paths (`user.name`, `items[0]`), comparison and logical operators, ternaries, string concatenation, assignment to top-level properties, `count++`, method calls on data (`items.push(x)`), `x-model="user.name"`.
 
-Not supported: arrow functions, template literals, destructuring, spread, nested property assignment (`user.name = 'x'`), globals (`window`, `document`, `console`, `Math`, `JSON`, `parseInt`), and `x-html`. The `allowGlobals` option defaults to `false` since 3.15.1. Put logic in `Alpine.data()` methods and keep markup expressions simple.
+Not supported: arrow functions, template literals, destructuring, spread, globals (`window`, `document`, `console`, `Math`, `JSON`, `parseInt`), and `x-html`. Nested property assignment (`user.name = 'x'`) works on plain data objects since 3.15.12 (writes to DOM objects are blocked), although the docs page still lists it as unsupported; a method call is the portable choice. The `allowGlobals` option defaults to `false` since 3.15.1. Put logic in `Alpine.data()` methods and keep markup expressions simple.

@@ -176,3 +176,5 @@ htmx 4 also ships `hx-live`, its own small reactive scripting layer; prefer Alpi
 - **`references/htmx-attributes.md`** — every attribute, modifier, config option, event, header and extension for 2.x and 4 side by side.
 - **`references/htmx-patterns.md`** — active search, inline edit, infinite scroll, sortable tables, bulk actions, cascading selects, polling, optimistic UI, server-rendered modals, file upload, SSE/WebSockets, each shown for both lines where they differ.
 - **`references/htmx-4-migration.md`** — step-by-step 2.x to 4 upgrade workflow and the compatibility switches.
+
+When a question goes beyond these files, fetch the official docs rather than guessing: htmx 4 serves every page as Markdown (`https://four.htmx.org/docs.md`, `/reference/attributes/hx-swap.md`, …) with an index at `https://four.htmx.org/llms.txt`; the `htmx.org@4.0.0` npm package also ships maintainer-written guidance in `dist/skills/` (`htmx-guidance.md`, `htmx-debugging.md`, `htmx-upgrade-from-htmx2.md`, `htmx-extension-authoring.md`). htmx 2 docs are at `https://htmx.org/docs/` and `https://htmx.org/attributes/<name>/` (no llms.txt).
