@@ -100,6 +100,7 @@ jobs:
                - Alpine.js: https://api.github.com/repos/alpinejs/alpine/releases?per_page=40 (and https://alpinejs.dev/ pages for anything the notes reference).
                - htmx: https://api.github.com/repos/bigskysoftware/htmx/releases?per_page=40 and, for a 4.x version, the maintainer guidance shipped in the package at https://cdn.jsdelivr.net/npm/htmx.org@<version>/dist/skills/htmx-guidance.md and htmx-upgrade-from-htmx2.md. Note that htmx 2.x is npm "latest" and 4.x is "next"; both lines are supported and documented side by side in this plugin, so a change on one line must not be written into the other's column.
             3. Update every pinned version string in skills/ (CDN script tags, "current as of", version tables) and in versions.json to the new versions. Use Grep to find each occurrence of the old version strings.
+               Keep every `integrity` and `crossorigin` attribute on script tags exactly as it is, even though the old hash will no longer match: a later workflow step recomputes SRI hashes. Do not try to compute hashes yourself, and do not remove the attributes.
             4. Change guidance only where a release note justifies it: a new directive, modifier, attribute, event, config key, plugin, or a documented behavior change. For each such change, keep a short note of the release-note line that justifies it. Do not add anything the release notes do not mention, and do not restate features that already appear in the files. Prefer leaving a file unchanged over guessing.
             5. Bump the version in .claude-plugin/plugin.json: patch if only version pins moved, minor if guidance changed. Add a dated entry at the top of CHANGELOG.md listing the version bump and each guidance change with its release-note citation.
             6. Validate: run `claude plugin validate --strict .` as a command by itself. If it fails because `claude` is not on PATH, run `npx -y @anthropic-ai/claude-code plugin validate --strict .` as a separate command. Fix anything it reports.
@@ -121,6 +122,11 @@ jobs:
           name: claude-transcript
           path: ${{ steps.claude.outputs.execution_file }}
           retention-days: 14
+
+      # Claude cannot compute hashes with its restricted tools, so recompute
+      # SRI hashes for bumped CDN URLs here (and restore any it dropped).
+      - name: Recompute SRI hashes
+        run: python3 .github/scripts/sri.py fix
 
       - name: Read PR body and remove it from the tree
         id: body
