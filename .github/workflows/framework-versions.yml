@@ -69,6 +69,7 @@ jobs:
       contents: write
       pull-requests: write
       id-token: write
+      actions: write   # dispatch validate.yml on the PR branch
     steps:
       - uses: actions/checkout@v6
         with:
@@ -128,26 +129,49 @@ jobs:
       - name: Recompute SRI hashes
         run: python3 .github/scripts/sri.py fix
 
+      # Move the body out of the tree before validating and committing.
       - name: Read PR body and remove it from the tree
-        id: body
+        shell: bash
+        env:
+          SUMMARY: ${{ needs.check.outputs.summary }}
+        run: |
+          set -euo pipefail
+          body="$RUNNER_TEMP/pr-body.md"
+          if [[ -f PR_BODY.md ]]; then
+            mv PR_BODY.md "$body"
+          else
+            { echo "Claude did not write PR_BODY.md; review the diff directly."; echo; echo "$SUMMARY"; } > "$body"
+          fi
+
+      # Check the tree before the PR exists. A failure still opens the PR (so
+      # Claude's work isn't lost) but flags it, and the job fails at the end.
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+      - name: Validate the updated plugin
+        id: validate
+        continue-on-error: true
+        run: .github/scripts/validate.sh
+
+      - name: Flag failed validation in the PR body
+        if: steps.validate.outcome == 'failure'
         shell: bash
         run: |
           set -euo pipefail
-          if [[ -f PR_BODY.md ]]; then
-            { echo "body<<EOF"; cat PR_BODY.md; echo; echo "EOF"; } >> "$GITHUB_OUTPUT"
-            rm PR_BODY.md
-          else
-            { echo "body<<EOF"; echo "Claude did not write PR_BODY.md; review the diff directly."; echo; echo "${{ needs.check.outputs.summary }}"; echo "EOF"; } >> "$GITHUB_OUTPUT"
-          fi
+          body="$RUNNER_TEMP/pr-body.md"
+          { printf '> [!CAUTION]\n> Validation failed in the upgrade job: %s/%s/actions/runs/%s\n\n' \
+              "$GITHUB_SERVER_URL" "$GITHUB_REPOSITORY" "$GITHUB_RUN_ID"; cat "$body"; } > "$body.new"
+          mv "$body.new" "$body"
 
       - name: Open or update the pull request
+        id: pr
         uses: peter-evans/create-pull-request@v8
         with:
           branch: chore/framework-versions
           delete-branch: true
           commit-message: "Update plugin for new Alpine.js / htmx releases"
           title: "Update plugin for new Alpine.js / htmx releases"
-          body: ${{ steps.body.outputs.body }}
+          body-path: ${{ runner.temp }}/pr-body.md
           labels: framework-update
           add-paths: |
             versions.json
@@ -156,3 +180,18 @@ jobs:
             skills/**
             agents/**
             README.md
+
+      # Pushes and PRs made with GITHUB_TOKEN don't start pull_request
+      # workflows, but workflow_dispatch does, and its check runs attach to
+      # the branch head commit, so they show on the PR.
+      - name: Run validate.yml on the PR branch
+        if: steps.pr.outputs.pull-request-operation == 'created' || steps.pr.outputs.pull-request-operation == 'updated'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run validate.yml --repo "$GITHUB_REPOSITORY" --ref chore/framework-versions
+
+      - name: Fail if validation failed
+        if: steps.validate.outcome == 'failure'
+        run: |
+          echo "::error::Plugin validation failed on the updated tree; the PR was opened but needs fixing."
+          exit 1
