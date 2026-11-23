@@ -25,7 +25,7 @@ htmx lets any element issue an HTTP request and swap the **HTML** response into 
 
 Two supported majors exist and they differ in ways that silently break code:
 
-| | **htmx 2.x** (2.0.11) | **htmx 4** (4.0.1; 4.0.0 stable 2026-08-28) |
+| | **htmx 2.x** (2.0.11) | **htmx 4** (4.0.2; 4.0.0 stable 2026-08-28) |
 |---|---|---|
 | Status | npm `latest`; htmx.org quick start; "supported indefinitely" | npm `next` until 2027 so unpinned 2.x users are not force-upgraded; the team's docs and shipped AI guidance now target it |
 | Transport | XMLHttpRequest | `fetch()`; streaming swaps; 60 s default timeout |
@@ -48,12 +48,12 @@ Install (pin exact versions; both docs recommend self-hosting rather than a CDN 
 <script src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.11/dist/htmx.min.js" integrity="sha384-2OatzQy1H+Zd/IIrjr1TcuDGqLXeHhbooAyJY1KdQMKnr4LZ22k31GBLdYKHmVjg" crossorigin="anonymous"></script>
 
 <!-- htmx 4 -->
-<script src="https://cdn.jsdelivr.net/npm/htmx.org@4.0.1" integrity="sha384-Qp9rdC8H7EqOoX+nR0P3RPG2Noji+qdwJlGpfzwQJsfOpp3sGwIdSP9xO3+UlEhn" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/htmx.org@4.0.2" integrity="sha384-6NzMyCdh08UZ4b4M17SJJKQLdDijx4z2IqqKLKD0Q/PzCFQLpFuk3konY0WgqbTy" crossorigin="anonymous"></script>
 <!-- htmx 4 extensions live in the same package -->
-<script src="https://cdn.jsdelivr.net/npm/htmx.org@4.0.1/dist/ext/hx-preload.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/htmx.org@4.0.2/dist/ext/hx-preload.js"></script>
 ```
 
-For a migration, use the **`htmx-upgrade`** skill (it wraps the shipped checker, `npx htmx.org@4.0.1 upgrade-check -- ./templates`); for a failure you cannot explain, use **`htmx-debug`**.
+For a migration, use the **`htmx-upgrade`** skill (it wraps the shipped checker, `npx htmx.org@4.0.2 upgrade-check -- ./templates`); for a failure you cannot explain, use **`htmx-debug`**.
 
 ## The request/target/swap/trigger model (both versions)
 
@@ -182,4 +182,4 @@ htmx 4 also ships `hx-live`, its own small reactive scripting layer; prefer Alpi
 
 Companion skills in this plugin: **`htmx-upgrade`** (2.x to 4 migration workflow and rename tables) and **`htmx-debug`** (lifecycle checklist and symptom-to-cause guide).
 
-When a question goes beyond these files, fetch the official docs rather than guessing: htmx 4 serves every page as Markdown (`https://four.htmx.org/docs.md`, `/reference/attributes/hx-swap.md`, …) with an index at `https://four.htmx.org/llms.txt`; the `htmx.org@4.0.1` npm package also ships maintainer-written guidance in `dist/skills/` (`htmx-guidance.md`, `htmx-debugging.md`, `htmx-upgrade-from-htmx2.md`, `htmx-extension-authoring.md`). htmx 2 docs are at `https://htmx.org/docs/` and `https://htmx.org/attributes/<name>/` (no llms.txt).
+When a question goes beyond these files, fetch the official docs rather than guessing: htmx 4 serves every page as Markdown (`https://four.htmx.org/docs.md`, `/reference/attributes/hx-swap.md`, …) with an index at `https://four.htmx.org/llms.txt`; the `htmx.org@4.0.2` npm package also ships maintainer-written guidance in `dist/skills/` (`htmx-guidance.md`, `htmx-debugging.md`, `htmx-upgrade-from-htmx2.md`, `htmx-extension-authoring.md`). htmx 2 docs are at `https://htmx.org/docs/` and `https://htmx.org/attributes/<name>/` (no llms.txt).

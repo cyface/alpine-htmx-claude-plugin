@@ -1,5 +1,13 @@
 # Changelog
 
+## 2.1.1 — 2026-11-23
+
+### Version bump
+- htmx 4 (`next`): 4.0.1 → 4.0.2. Alpine.js 3.17.5 and htmx 2.0.11 unchanged.
+
+### Guidance changes
+- None. Version pins only (`versions.json`, `README.md`, htmx skill, htmx-upgrade skill and references). The 4.0.2 notes (`sse-*`/`ws-*` attribute removal, `hx-live` registration, delay/throttle cancellation, browser-specific fixes) are either already covered or not specific enough to document.
+
 ## 2.1.0 — 2026-11-03
 
 ### Version bump

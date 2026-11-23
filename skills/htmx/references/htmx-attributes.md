@@ -1,6 +1,6 @@
 # htmx — Attribute, Config, Event and Header Reference (2.x and 4)
 
-Columns marked **2.x** describe htmx 2.0.11; **4** describes htmx 4.0.1 (differences from 4.0.0 are called out). Unmarked text applies to both.
+Columns marked **2.x** describe htmx 2.0.11; **4** describes htmx 4.0.2 (differences from 4.0.0 are called out). Unmarked text applies to both.
 
 ## Contents
 
@@ -373,7 +373,7 @@ Community (notable): `alpine-morph`, `class-tools`, `json-enc`, `loading-states`
 
 ### 4
 
-All official extensions ship inside `htmx.org@4.0.1/dist/ext/<name>.js`; including the script activates it. Optional allow-list: `<meta name="htmx-config" content='{"extensions": "sse, preload"}'>` using registration names (`hx-sse.js` → `sse`, `hx-preload.js` → `preload`, `htmx-2-compat.js` → `compat`). The `htmax.js` bundle packs core plus the most common extensions.
+All official extensions ship inside `htmx.org@4.0.2/dist/ext/<name>.js`; including the script activates it. Optional allow-list: `<meta name="htmx-config" content='{"extensions": "sse, preload"}'>` using registration names (`hx-sse.js` → `sse`, `hx-preload.js` → `preload`, `htmx-2-compat.js` → `compat`). The `htmax.js` bundle packs core plus the most common extensions.
 
 | Extension | Purpose |
 |-----------|---------|
